@@ -39,6 +39,7 @@ struct BuilderContext
   GFile          *base_dir;
   SoupSession    *soup_session;
   char           *arch;
+  char           *arch_emulator;
 
   GFile          *download_dir;
   GFile          *state_dir;
@@ -85,6 +86,7 @@ builder_context_finalize (GObject *object)
   g_clear_object (&self->soup_session);
   g_clear_object (&self->options);
   g_free (self->arch);
+  g_free (self->arch_emulator);
   g_strfreev (self->cleanup);
   g_strfreev (self->cleanup_platform);
 
@@ -264,6 +266,20 @@ builder_context_set_arch (BuilderContext *self,
 {
   g_free (self->arch);
   self->arch = g_strdup (arch);
+}
+
+const char *
+builder_context_get_arch_emulator (BuilderContext *self)
+{
+  return (const char *) self->arch_emulator;
+}
+
+void
+builder_context_set_arch_emulator (BuilderContext *self,
+                                   const char     *arch_emulator)
+{
+  g_free (self->arch_emulator);
+  self->arch_emulator = g_strdup (arch_emulator);
 }
 
 BuilderOptions *

@@ -45,6 +45,7 @@ static gboolean opt_require_changes;
 static gboolean opt_keep_build_dirs;
 static gboolean opt_force_clean;
 static char *opt_arch;
+static char *opt_arch_emulator;
 static char *opt_repo;
 static char *opt_subject;
 static char *opt_body;
@@ -54,7 +55,8 @@ static char **opt_key_ids;
 static GOptionEntry entries[] = {
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &opt_verbose, "Print debug information during command processing", NULL },
   { "version", 0, 0, G_OPTION_ARG_NONE, &opt_version, "Print version information and exit", NULL },
-  { "arch", 0, 0, G_OPTION_ARG_STRING, &opt_arch, "Architecture to build for (must be host compatible)", "ARCH" },
+  { "arch", 0, 0, G_OPTION_ARG_STRING, &opt_arch, "Architecture to build for (must be host compatible or provide an emulator)", "ARCH" },
+  { "arch-emulator", 0, 0, G_OPTION_ARG_STRING, &opt_arch_emulator, "User Emulator if Architecture to build for is not host compatible", "ARCH-EMULATOR" },
   { "run", 0, 0, G_OPTION_ARG_NONE, &opt_run, "Run a command in the build directory (see --run --help)", NULL },
   { "ccache", 0, 0, G_OPTION_ARG_NONE, &opt_ccache, "Use ccache", NULL },
   { "disable-cache", 0, 0, G_OPTION_ARG_NONE, &opt_disable_cache, "Disable cache lookups", NULL },
@@ -75,7 +77,8 @@ static GOptionEntry entries[] = {
 
 static GOptionEntry run_entries[] = {
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &opt_verbose, "Print debug information during command processing", NULL },
-  { "arch", 0, 0, G_OPTION_ARG_STRING, &opt_arch, "Architecture to build for (must be host compatible)", "ARCH" },
+  { "arch", 0, 0, G_OPTION_ARG_STRING, &opt_arch, "Architecture to build for (must be host compatible or provide an emulator)", "ARCH" },
+  { "arch-emulator", 0, 0, G_OPTION_ARG_STRING, &opt_arch_emulator, "User Emulator if Architecture to build for is not host compatible", "ARCH-EMULATOR" },
   { "run", 0, 0, G_OPTION_ARG_NONE, &opt_run, "Run a command in the build directory", NULL },
   { "ccache", 0, 0, G_OPTION_ARG_NONE, &opt_ccache, "Use ccache", NULL },
   { NULL }
@@ -284,6 +287,8 @@ main (int    argc,
 
   if (opt_arch)
     builder_context_set_arch (build_context, opt_arch);
+  if (opt_arch_emulator)
+    builder_context_set_arch_emulator (build_context, opt_arch_emulator);
 
   if (opt_ccache &&
       !builder_context_enable_ccache (build_context, &error))

@@ -1022,6 +1022,37 @@ builder_manifest_init_app_dir (BuilderManifest *self,
         return FALSE;
     }
 
+  const char *arch_emulator;
+
+  arch_emulator = builder_context_get_arch_emulator (context);
+  if (arch_emulator)
+    {
+      //FIXME should be in a runtime extension instead
+      g_print ("Copying architecture emulator\n");
+      GFile *src_file, *dest_file;
+      GFile *files_dir, *bin_dir;
+
+      src_file = g_file_new_for_path (arch_emulator);
+      files_dir = g_file_get_child (app_dir, "files");
+      bin_dir = g_file_get_child (files_dir, "bin");
+      g_object_unref (files_dir);
+      g_file_make_directory (bin_dir, NULL, NULL);
+      dest_file = g_file_get_child (bin_dir, "flatpak-arch-emulator");
+      g_object_unref (bin_dir);
+
+      if (!g_file_copy (src_file, dest_file,
+                        G_FILE_COPY_NONE,
+                        NULL, NULL, NULL, error))
+        {
+          g_object_unref (dest_file);
+          g_object_unref (src_file);
+          return FALSE;
+        }
+
+      g_object_unref (dest_file);
+      g_object_unref (src_file);
+    }
+
   return TRUE;
 }
 
